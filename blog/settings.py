@@ -38,8 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_seed',
+    'drf_yasg',
+
     'category',
-    'posts'
+    'posts',
+    'comment'
 
 ]
 

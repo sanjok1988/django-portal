@@ -13,6 +13,7 @@ class Post(models.Model):
     content = models.TextField()
     excerpt = models.TextField(max_length=300)
     file = models.FileField()
+    image = models.ImageField(null=True, blank=True, upload_to='media/images/posts/%Y-%m-%d/')
     featured_image = models.FileField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     comment_count = models.IntegerField(default=0)
@@ -26,4 +27,4 @@ class Post(models.Model):
     deleted_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return 'Title:{}, Category: {} '.format(self.title, self.category)

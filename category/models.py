@@ -7,7 +7,7 @@ from django.template.defaultfilters import slugify
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=80, verbose_name='Category Slug')
+    name = models.CharField(max_length=80, verbose_name='Category Name')
     slug = models.SlugField(max_length=100)
     status = models.IntegerField(default=1)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='category_created_by')
