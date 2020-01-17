@@ -11,6 +11,7 @@ from posts.models import Post
 class PostAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'category', 'status']
     list_filter = ('category', 'status')
+    search_fields = ('title',)
 
 
 admin.site.register(Post, PostAdmin)
