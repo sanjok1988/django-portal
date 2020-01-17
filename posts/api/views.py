@@ -1,4 +1,6 @@
 from django.db.models import Prefetch
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -32,11 +34,21 @@ def get_post_comments(request):
     comments = Comment.objects.order_by('post_id', '-id')
     posts = Post.objects.prefetch_related(Prefetch('comments', queryset=comments, to_attr='latest'))
     for post in posts:
-        dir(post.latest)
-       # print(CommentSerializer(post.latest))
+        print(post.latest)
+    # print(CommentSerializer(post.latest))
 
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_post_detail(request, **kwargs):
+    post = get_object_or_404(Post, pk=kwargs.get('id'))
+    print(post)
+    comments = post.comments.filter(is_active=True)
+    print(comments)
+    data = CommentSerializer(comments, many=True).data
+    return Response(data)
 
 
 @api_view(['GET'])
