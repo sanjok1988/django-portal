@@ -6,6 +6,7 @@ from django.db import models
 from category.models import Category
 
 
+
 class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     title = models.CharField(max_length=100)
@@ -25,6 +26,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return 'Title:{}, Category: {} '.format(self.title, self.category)

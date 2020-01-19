@@ -29,26 +29,19 @@ class PostByCategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+# fetch all comments and all posts
 @api_view(['GET'])
 def get_post_comments(request):
-    comments = Comment.objects.order_by('post_id', '-id')
-    posts = Post.objects.prefetch_related(Prefetch('comments', queryset=comments, to_attr='latest'))
-    for post in posts:
-        print(post.latest)
-    # print(CommentSerializer(post.latest))
-
-    serializer = CommentSerializer(comments, many=True)
+    serializer = PostSerializer(Post.objects.all(), many=True)
     return Response(serializer.data)
 
 
+# fetch singe post details with comments
 @api_view(['GET'])
 def get_post_detail(request, **kwargs):
     post = get_object_or_404(Post, pk=kwargs.get('id'))
-    print(post)
-    comments = post.comments.filter(is_active=True)
-    print(comments)
-    data = CommentSerializer(comments, many=True).data
-    return Response(data)
+    serializer = PostSerializer(post, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])

@@ -6,7 +6,7 @@ from .views import PostByCategoryViewSet, PostViewSet, get_posts_by_category, ge
 
 router = routers.DefaultRouter()
 router.register(r'post', viewset=PostViewSet)
-router.register(r'category', viewset=PostByCategoryViewSet)
+# router.register(r'category', viewset=PostByCategoryViewSet)
 
 
 urlpatterns = [
