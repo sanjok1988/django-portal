@@ -1,15 +1,13 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
-
 from comment.models import Comment
-#from posts.api.serializers import PostSerializer
+from user.api.serializers import AuthorSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    #post = PostSerializer()
+    author = AuthorSerializer()
 
     class Meta:
         model = Comment
-        fields = ['id', 'message']
+        fields = ['id', 'message', 'created_at', 'updated_at', 'author']
 
 

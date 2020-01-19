@@ -1,10 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
 # Create your models here.
 from category.models import Category
-
 
 
 class Post(models.Model):
@@ -26,7 +24,6 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(auto_now=True)
-
 
     def __str__(self):
         return 'Title:{}, Category: {} '.format(self.title, self.category)
