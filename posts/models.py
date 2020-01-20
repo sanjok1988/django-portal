@@ -1,3 +1,5 @@
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -9,7 +11,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     title = models.CharField(max_length=100)
     sub_title = models.CharField(max_length=100)
-    content = models.TextField()
+    content = RichTextUploadingField()
     excerpt = models.TextField(max_length=300)
     file = models.FileField(null=True, blank=True, upload_to='media/files/posts/%Y-%m-%d/')
     image = models.ImageField(null=True, blank=True, upload_to='media/images/posts/%Y-%m-%d/')

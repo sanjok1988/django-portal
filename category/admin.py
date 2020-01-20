@@ -11,6 +11,10 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'status']
     list_filter = ['status']
 
+    fieldsets = [
+            ( None, { 'fields' : ['name', 'slug']}),
+            ('Additional Info', { 'fields' : ['status',]}),
+        ]
 
 admin.site.register(Category, CategoryAdmin)
 

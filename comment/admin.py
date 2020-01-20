@@ -5,8 +5,8 @@ from comment.models import Comment
 
 
 @admin.register(Comment)
-class AdminComment(admin.ModelAdmin):
-    list_display = ['id', 'message']
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'message', 'is_active']
     actions = ['approve_comments']
 
     # def approve_comments(self, request, queryset):

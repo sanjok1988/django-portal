@@ -12,6 +12,9 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'category', 'status']
     list_filter = ('category', 'status')
     search_fields = ('title',)
+    list_display_links = ('title',)
+
+
 
 
 admin.site.register(Post, PostAdmin)
