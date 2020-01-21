@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'ckeditor',
     'ckeditor_uploader',
+    'tastypie',
 
 
     'corsheaders',            # add this
@@ -51,7 +52,7 @@ INSTALLED_APPS = [
     'category',
     'posts',
     'comment',
-    'home'
+    'home',
 
 ]
 
@@ -162,6 +163,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': '127.0.0.1:11211',
+#     }
+# }
 
 CKEDITOR_CONFIGS = {
     'default': {

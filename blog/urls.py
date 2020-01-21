@@ -44,7 +44,8 @@ urlpatterns = [
 
     path('api/category/', include('category.api.urls')),
     path('api/posts/', include('posts.api.urls')),
-    path('api/user/', include('user.api.urls'))
+    path('api/user/', include('user.api.urls')),
+
 ]
 
 if settings.DEBUG:

@@ -1,10 +1,11 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
+from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from user.api.serializers import UserSerializer, GroupSerializer
+from user.api.serializers import UserSerializer, GroupSerializer, PermissionSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -40,3 +41,22 @@ def get_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, context=serializer_context, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_permissions(request):
+    permissions = Permission.objects.all()
+    serializer = PermissionSerializer(permissions, many=True)
+    return Response(serializer.data)
+
+
+class Permissions(viewsets.ModelViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+
+    def get_user_permission(self, bundle, **kwargs):
+        user_id = kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        permissions = user.user_permissions.all()
+        serializer = self.get_serializer(permissions, many=True)
+        return Response(serializer.data)
