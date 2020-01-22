@@ -1,8 +1,10 @@
+from django.contrib.auth.models import User
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
@@ -10,16 +12,24 @@ from category.api.serializers import CategorySerializer
 from category.models import Category
 from comment.api.serializers import CommentSerializer
 from comment.models import Comment
-from .serializers import PostSerializer
+from utils.common_methods import EnableDisableViewSet
+from .serializers import PostSerializer, PostListSerializer
 from ..models import Post
 
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+class PostViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.filter(category__status=1)
+    serializer_class = PostListSerializer
 
 
-class PostByCategoryViewSet(viewsets.ModelViewSet):
+# fetch post by category
+class PostByCategoryViewSet(
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
@@ -27,6 +37,33 @@ class PostByCategoryViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.filter(category=kwargs['pk'])
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+# fetch all post of an author
+class PostByAuthorViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.all()
+    serializer_class = PostListSerializer
+
+    def list(self, request, *args, **kwargs):
+        author = kwargs.get('author')
+        try:
+            user = User.objects.get(username=author)
+        except User.DoesNotExist:
+            raise ValidationError({'detail': 'Author not found'})
+
+        queryset = self.get_queryset().filter(author=user, status=1, category__status=1)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PostEnableDisableViewSet(
+    EnableDisableViewSet
+):
+    queryset = Post.objects.all()
+    serializer_class = PostListSerializer
 
 
 # fetch all comments and all posts

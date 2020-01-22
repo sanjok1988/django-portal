@@ -170,6 +170,10 @@ REST_FRAMEWORK = {
 #     }
 # }
 
+SWAGGER_SETTINGS = {
+'JSON_EDITOR': True,
+}
+
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono',

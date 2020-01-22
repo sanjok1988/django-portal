@@ -14,3 +14,12 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'excerpt', 'category', 'author', 'comments']
+
+
+class PostListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'excerpt', 'status', 'category', 'author']
