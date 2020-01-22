@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Subquery, Max, Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
@@ -17,6 +17,7 @@ from .serializers import PostSerializer, PostListSerializer
 from ..models import Post
 
 
+# fetch list of post
 class PostViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
@@ -34,7 +35,7 @@ class PostByCategoryViewSet(
     queryset = Post.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = Post.objects.filter(category=kwargs['pk'])
+        queryset = self.get_queryset().filter(category=kwargs['pk'])
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -54,11 +55,45 @@ class PostByAuthorViewSet(
         except User.DoesNotExist:
             raise ValidationError({'detail': 'Author not found'})
 
-        queryset = self.get_queryset().filter(author=user, status=1, category__status=1)
+        queryset = self.get_queryset() \
+            .filter(author=user, status=1, category__status=1) \
+            .only('title', 'excerpt')  # The only difference between only and values is only also fetches the id.
+        # print(str(queryset.query))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class PopularPostViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.all()
+    serializer_class = PostListSerializer
+
+
+# fetch most commented post
+class MostCommentedPostViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.all()
+    serializer_class = PostListSerializer
+
+    def list(self, request, *args, **kwargs):
+        #instance = Comment.objects.values('post_id').order_by('-comment_count').annotate(comment_count=Count('post_id'))[:1]
+        data = Comment.objects.values('post_id').order_by('-comment_count').annotate(comment_count=Count('post_id'))
+
+        post_ids = []
+        for id in data:
+            post_ids.append(id['post_id'])
+
+        posts = self.get_queryset().filter(pk__in=post_ids)
+        # max_comment = instance.values('comment_count')
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
+
+
+# enable and disable status to 0 and 1
 class PostEnableDisableViewSet(
     EnableDisableViewSet
 ):
