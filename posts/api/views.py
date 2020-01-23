@@ -1,19 +1,15 @@
 from django.contrib.auth.models import User
-from django.db.models import Prefetch, Subquery, Max, Count
-from django.http import JsonResponse
+from django.db.models import Max, Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
-from category.api.serializers import CategorySerializer
-from category.models import Category
-from comment.api.serializers import CommentSerializer
 from comment.models import Comment
 from utils.common_methods import EnableDisableViewSet
-from .serializers import PostSerializer, PostListSerializer
+from utils.mixins import UpdateModelMixin
+from .serializers import PostSerializer, PostListSerializer, PostDetailSerializer
 from ..models import Post
 
 
@@ -22,7 +18,33 @@ class PostViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Post.objects.filter(category__status=1)
+    queryset = Post.objects.filter(category__status=1, status=1)
+    serializer_class = PostListSerializer
+
+
+# read detail of post
+class PostDetailViewSet(
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.filter(status=1, category__status=1)
+    serializer_class = PostDetailSerializer
+
+
+class UnpublishedPostViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.filter(Q(category__status=0) | Q(status=0)).only('title', 'author_id', 'status')
+    serializer_class = PostListSerializer
+
+
+# fetch all soft deleted posts
+class PostTrashViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.all_objects.all()
     serializer_class = PostListSerializer
 
 
@@ -32,7 +54,7 @@ class PostByCategoryViewSet(
     viewsets.GenericViewSet
 ):
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(category__status=1, status=1)
 
     def retrieve(self, request, *args, **kwargs):
         queryset = self.get_queryset().filter(category=kwargs['pk'])
@@ -45,7 +67,7 @@ class PostByAuthorViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(category__status=1, status=1)
     serializer_class = PostListSerializer
 
     def list(self, request, *args, **kwargs):
@@ -63,12 +85,18 @@ class PostByAuthorViewSet(
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# most viewed post
 class PopularPostViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(category__status=1, status=1).only('title')
     serializer_class = PostListSerializer
+
+    def list(self, request, *args, **kwargs):
+        posts = self.get_queryset().order_by().annotate(Max('views_count'))[:5]
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # fetch most commented post
@@ -76,19 +104,12 @@ class MostCommentedPostViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(category__status=1, status=1)
     serializer_class = PostListSerializer
 
     def list(self, request, *args, **kwargs):
-        #instance = Comment.objects.values('post_id').order_by('-comment_count').annotate(comment_count=Count('post_id'))[:1]
-        data = Comment.objects.values('post_id').order_by('-comment_count').annotate(comment_count=Count('post_id'))
-
-        post_ids = []
-        for id in data:
-            post_ids.append(id['post_id'])
-
-        posts = self.get_queryset().filter(pk__in=post_ids)
-        # max_comment = instance.values('comment_count')
+        data = Comment.objects.values('post_id').order_by('-comment_count').annotate(comment_count=Count('post_id'))[:5]
+        posts = self.get_queryset().filter(pk__in=[item['post_id'] for item in data])
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
 
@@ -99,6 +120,44 @@ class PostEnableDisableViewSet(
 ):
     queryset = Post.objects.all()
     serializer_class = PostListSerializer
+
+
+# Enable disable comment on single post
+class EnableDisableCommentOnPost(
+    UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.all()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        instance = self.queryset.get(pk=kwargs.get('pk'))
+        if instance.comment_status == 1:
+            instance.comment_status = 0
+        else:
+            instance.comment_status = 1
+
+        instance.save(update_fields=["comment_status"])
+        return Response(status=status.HTTP_200_OK)
+
+
+# restore soft deleted post
+class RestorePostViewSet(
+    UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Post.objects.all()
+    serializer_class = PostListSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        post_id = kwargs.get('pk')
+        try:
+            post = Post.all_objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            raise ValidationError({'detail': 'Detail not found'})
+        post.restore()
+        return Response(status=status.HTTP_200_OK)
 
 
 # fetch all comments and all posts

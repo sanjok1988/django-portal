@@ -22,4 +22,15 @@ class PostListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'excerpt', 'status', 'category', 'author']
+        fields = ['id', 'title', 'excerpt', 'status', 'views_count', 'category', 'author']
+
+
+class PostDetailSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    author = AuthorSerializer()
+    comments = CommentSerializer(many=True)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'sub_title', 'excerpt', 'content', 'file', 'image', 'featured_image',
+                  'views_count', 'comment_status', 'category', 'author', 'comments']
