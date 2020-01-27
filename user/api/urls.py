@@ -2,13 +2,15 @@ from django.urls import path
 from rest_framework import routers
 
 from user.api import views
-from user.api.views import UserViewSet, GroupViewSet, get_users, UserList, get_permissions, Permissions
+from user.api.views import UserViewSet, GroupViewSet, get_users, UserList, get_permissions, Permissions, LoginView
 
 router = routers.SimpleRouter()
 router.register(r'user', viewset=UserViewSet)
 router.register(r'group', viewset=GroupViewSet)
 # router.register(r'per', viewset=Permissions)
 urlpatterns = [
+    path("login/", LoginView.as_view(), name="login"),
+    # path("drf/login/", views.obtain_auth_token, name="drf-login"),
     path('users/', get_users ),
     path('usrs/', UserList.as_view()),
     path('permissions/', get_permissions),

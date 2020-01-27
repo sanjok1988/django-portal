@@ -32,10 +32,11 @@ class Post(SoftDeletionModel):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_updated_by')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    objects = PostManager()
+    # objects = PostManager()
 
     def __str__(self):
         return 'Title:{}, Category: {} '.format(self.title, self.category)
+
 
     # def get_published(self):
     #     return Post.objects.filter(status=1, category__status=1)

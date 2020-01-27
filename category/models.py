@@ -26,3 +26,10 @@ class Category(models.Model):
         self.slug = slugify(self.name)
         super(Category, self).save(*args, **kwargs)
         return self
+
+    @property
+    def display_status(self):
+        if self.status==1:
+            return "active"
+        else:
+            return "deactive"
