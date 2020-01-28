@@ -1,5 +1,7 @@
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
+from django import forms
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -9,6 +11,19 @@ from django.utils.safestring import mark_safe
 from category.models import Category
 from utils.soft_delete_model import SoftDeletionModel
 
+Status = [
+    (1, 'Publish'),
+    (0, 'Draft')
+]
+
+CommentStatus = [
+    (1, 'Allow'),
+    (0, 'Disable')
+]
+
+
+
+
 
 class PostManager(models.Manager):
     def get_published(self):
@@ -16,7 +31,7 @@ class PostManager(models.Manager):
 
 
 class Post(SoftDeletionModel):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1,)
     title = models.CharField(max_length=100)
     sub_title = models.CharField(max_length=100)
     content = RichTextUploadingField()
@@ -27,8 +42,8 @@ class Post(SoftDeletionModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     comment_count = models.IntegerField(default=0)
     views_count = models.IntegerField(default=0)
-    comment_status = models.IntegerField(default=0)
-    status = models.IntegerField(default=0)
+    comment_status = models.IntegerField(default=0, choices=CommentStatus)
+    status = models.IntegerField(default=0, choices=Status, verbose_name="Publish Status")
     schedule_date = models.DateTimeField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_created_by')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_updated_by')
@@ -53,3 +68,6 @@ class Post(SoftDeletionModel):
         if self.featured_image:
             url = self.featured_image.url
         return mark_safe('<img src="{url}" width="200" />'.format(url=url))
+
+
+

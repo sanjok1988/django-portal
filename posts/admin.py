@@ -1,12 +1,7 @@
+from django import forms
 from django.contrib import admin
-
-# Register your models here.
-#
-# @admin.register(Post)
-# @data_generator_register
 from django.contrib.admin import SimpleListFilter
-from pylint.checkers.typecheck import _
-
+from category.models import Category
 from posts.models import Post
 from utils.mixins import ExportCsvMixin
 
@@ -22,8 +17,17 @@ class PopularPostFilter(SimpleListFilter):
         pass
 
 
+class CategoryChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "{}".format(obj.name)
+
+
 class PostAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ['id', 'title', 'category', 'author', 'is_published',]
+
+    fields = ('schedule_date', 'category', 'title', 'sub_title', 'content', 'excerpt', 'author', 'featured_image',
+              'featured_image_preview',
+              'image', 'file', 'comment_status', 'status',)
+    list_display = ['id', 'title', 'category', 'author', 'is_published', ]
     list_filter = (PopularPostFilter, 'category', 'status',)
     search_fields = ('title',)
     list_display_links = ('title',)
@@ -31,22 +35,17 @@ class PostAdmin(admin.ModelAdmin, ExportCsvMixin):
     raw_id_fields = ("category",)
     list_per_page = 20
     date_hierarchy = 'created_at'
-    readonly_fields = ["featured_image_preview",]
-
-
+    readonly_fields = ["featured_image_preview", ]
 
     def is_published(self, obj):
         return obj.status
 
     is_published.boolean = True
 
-    # def featured_image_preview(self, obj):
-    #     print(obj.featured_image.url)
-    #     print(obj.featured_image.width)
-    #     return mark_safe('<img src="{url}" width="150" height="150" />'.format(
-    #         url=obj.featured_image.url,
-    #
-    #     ))
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'category':
+            return CategoryChoiceField(queryset=Category.objects.all())
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Post, PostAdmin)
