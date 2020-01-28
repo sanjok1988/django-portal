@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'ckeditor',
     'ckeditor_uploader',
-    'tastypie',
+    # 'tastypie',
+
 
 
     'corsheaders',            # add this
