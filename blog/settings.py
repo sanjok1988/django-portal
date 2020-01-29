@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'ckeditor',
     'ckeditor_uploader',
+    'import_export',
     # 'tastypie',
 
 
@@ -146,7 +147,7 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = '/static/'
+STATIC_ROOT = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'

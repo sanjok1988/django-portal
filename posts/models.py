@@ -58,6 +58,7 @@ class Post(SoftDeletionModel):
     # def get_published(self):
     #     return Post.objects.filter(status=1, category__status=1)
 
+    @property
     def published_date(self):
         if self.schedule_date is None:
             return self.created_at

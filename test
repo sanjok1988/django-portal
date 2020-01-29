@@ -1,0 +1,1 @@
+Returns last 10 lines of a file split('\n') will return the file as a list where each item of the list is a line from file. [-10:] will perform a slicing operation on the list. Negative indexing, [-n], denotes nth element from the last. Here, the slicing operation will return last 10 items of the list i.e. last 10 lines of the file.

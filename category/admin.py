@@ -3,16 +3,32 @@ from django.contrib import admin
 # Register your models here.
 from django.http import HttpResponseRedirect
 from django.urls import path
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin, ExportActionMixin
+
 from category.models import Category
 from utils.mixins import ExportCsvMixin
 
 
-class CategoryAdmin(admin.ModelAdmin, ExportCsvMixin):
-    change_list_template = "admin/category/category/category_change_list.html"
+class CategoryResource(resources.ModelResource):
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'post__author',)
+        export_order = ('id', 'name', 'post__author')
+
+
+class CategoryAdmin(ImportExportModelAdmin, ExportCsvMixin ):
+    #change_list_template = "admin/category/category/category_change_list.html"
+
     prepopulated_fields = {"slug": ("name",)}
-    list_display = ['id', 'name', 'post_count', 'display_status']
+    list_display = ['name', 'post_count', 'display_status']
     list_filter = ['status']
     actions = ["export_as_csv", "unpublish"]
+    list_display_links = ['name', ]
+    ordering = ('name',)
+
+    resource_class = CategoryResource
+
 
     fieldsets = [
         (None, {'fields': ['name', 'slug']}),

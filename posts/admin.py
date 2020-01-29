@@ -1,6 +1,10 @@
 from django import forms
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.urls import reverse
+from django.utils.html import format_html
+
 from category.models import Category
 from posts.models import Post
 from utils.mixins import ExportCsvMixin
@@ -23,11 +27,10 @@ class CategoryChoiceField(forms.ModelChoiceField):
 
 
 class PostAdmin(admin.ModelAdmin, ExportCsvMixin):
-
-    fields = ('schedule_date', 'category', 'title', 'sub_title', 'content', 'excerpt', 'author', 'featured_image',
-              'featured_image_preview',
-              'image', 'file', 'comment_status', 'status',)
-    list_display = ['id', 'title', 'category', 'author', 'is_published', ]
+    fields = ('schedule_date', 'category', 'title', 'sub_title', 'content', 'excerpt', 'author', ('featured_image',
+              'featured_image_preview'),
+              'image', 'file', ('comment_status', 'status',))
+    list_display = ['id', 'title', 'category', 'author', 'published_date', 'is_published', 'post_actions',]
     list_filter = (PopularPostFilter, 'category', 'status',)
     search_fields = ('title',)
     list_display_links = ('title',)
@@ -46,6 +49,34 @@ class PostAdmin(admin.ModelAdmin, ExportCsvMixin):
         if db_field.name == 'category':
             return CategoryChoiceField(queryset=Category.objects.all())
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            # url(
+            #     r'^(?P<post_id>.+)/activate/$',
+            #     self.admin_site.admin_view(self.activate),
+            #     name='activate',
+            # ),
+            # url(
+            #     r'^(?P<account_id>.+)/deactivate/$',
+            #     self.admin_site.admin_view(self.deactivate),
+            #     name='deactivate',
+            # ),
+        ]
+        return urls
+
+
+    def post_actions(self, obj):
+        return format_html(
+            '<a class="button" href="{}">Edit</a>&nbsp;'
+            '<a class="button button-danger" href="{}" style="background:red">Trash</a>',
+            reverse('admin:posts_post_change', args=[obj.pk]),
+            reverse('admin:posts_post_delete', args=[obj.pk]),
+        )
+
+    post_actions.short_description = 'Actions'
+    post_actions.allow_tags = True
 
 
 admin.site.register(Post, PostAdmin)
