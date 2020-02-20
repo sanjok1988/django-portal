@@ -16,6 +16,7 @@ from ..models import Post
 # fetch list of post
 class PostViewSet(
     mixins.ListModelMixin,
+    mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Post.objects.filter(category__status=1, status=1)

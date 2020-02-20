@@ -51,6 +51,8 @@ class Post(SoftDeletionModel):
     updated_at = models.DateTimeField(auto_now=True)
 
     # objects = PostManager()
+    class Meta:
+        pass
 
     def __str__(self):
         return 'Title:{}, Category: {} '.format(self.title, self.category)

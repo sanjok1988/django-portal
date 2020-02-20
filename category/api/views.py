@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.response import Response
 
 from category.api.serializers import CategorySerializer
@@ -12,8 +12,12 @@ from utils.common_methods import EnableDisableViewSet
 class CategoryViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    permission_classes = (permissions.AllowAny,)
+
     serializer_class = CategorySerializer
     queryset = Category.objects.filter(status=1)
 

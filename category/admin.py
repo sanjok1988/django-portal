@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
 from import_export import resources
-from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin, ExportActionMixin
+from import_export.admin import ImportExportModelAdmin
 
 from category.models import Category
 from utils.mixins import ExportCsvMixin
