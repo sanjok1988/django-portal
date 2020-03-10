@@ -21,6 +21,10 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework_simplejwt import views as jwt_views
+from rest_framework_simplejwt.views import TokenVerifyView
+
+from user.api.views import RegisterUserView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -43,9 +47,15 @@ urlpatterns = [
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     # url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
-    path('api/category/', include('category.api.urls')),
+    path('api/v1/', include('category.api.urls')),
     path('api/posts/', include('posts.api.urls')),
-    path('api/user/', include('user.api.urls')),
+    path('api/v1/', include('user.api.urls')),
+    path('api/v1/auth/login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
+# jwt path
+    path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

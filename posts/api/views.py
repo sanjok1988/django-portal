@@ -2,8 +2,9 @@ from django.contrib.auth.models import User
 from django.db.models import Max, Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from comment.models import Comment
@@ -17,17 +18,22 @@ from ..models import Post
 class PostViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    permission_classes = (AllowAny,)
     queryset = Post.objects.filter(category__status=1, status=1)
     serializer_class = PostListSerializer
 
 
 # read detail of post
+@permission_classes((IsAuthenticated, ))
+# @authentication_classes((JSONWebTokenAuthentication,))
 class PostDetailViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
+
     queryset = Post.objects.filter(status=1, category__status=1)
     serializer_class = PostDetailSerializer
 
