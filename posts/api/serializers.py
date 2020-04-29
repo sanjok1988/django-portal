@@ -25,12 +25,30 @@ class PostListSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'excerpt', 'status', 'views_count', 'category', 'author']
 
 
+class PostCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'excerpt', 'content', 'status', 'category', 'image', 'author']
+    #
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     Post.category.set(validated_data['category'])
+    #     post = Post.objects.create(validated_data)
+
+
 class PostDetailSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    author = AuthorSerializer()
-    comments = CommentSerializer(many=True)
+    # category = CategorySerializer()
+    # author = AuthorSerializer()
+    # comments = CommentSerializer(many=True)
 
     class Meta:
         model = Post
         fields = ['id', 'title', 'sub_title', 'excerpt', 'content', 'file', 'image', 'featured_image',
-                  'views_count', 'comment_status', 'category', 'author', 'comments']
+                  'views_count', 'comment_status', 'category', 'author', 'status']
+
+
+class ToggleStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['status']

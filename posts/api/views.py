@@ -10,8 +10,9 @@ from rest_framework.response import Response
 from comment.models import Comment
 from utils.common_methods import EnableDisableViewSet
 from utils.mixins import UpdateModelMixin
-from .serializers import PostSerializer, PostListSerializer, PostDetailSerializer
-from ..models import Post
+from .serializers import PostSerializer, PostListSerializer, \
+    PostDetailSerializer, PostCreateSerializer, ToggleStatusSerializer
+from posts.models import Post
 
 
 # fetch list of post
@@ -19,21 +20,33 @@ class PostViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     viewsets.GenericViewSet
 ):
     permission_classes = (AllowAny,)
-    queryset = Post.objects.filter(category__status=1, status=1)
+    # queryset = Post.objects.filter(category__status=1, status=1)
+    queryset = Post.objects.all().order_by('id').reverse()
     serializer_class = PostListSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PostListSerializer
+        if self.action == 'create':
+            return PostCreateSerializer
+        if self.action == 'retrieve':
+            return PostDetailSerializer
+        if self.action == 'partial_update':
+            return PostCreateSerializer
 
 
 # read detail of post
-@permission_classes((IsAuthenticated, ))
+@permission_classes((IsAuthenticated,))
 # @authentication_classes((JSONWebTokenAuthentication,))
 class PostDetailViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
-
     queryset = Post.objects.filter(status=1, category__status=1)
     serializer_class = PostDetailSerializer
 
@@ -125,8 +138,36 @@ class MostCommentedPostViewSet(
 class PostEnableDisableViewSet(
     EnableDisableViewSet
 ):
+    permission_classes = (AllowAny,)
     queryset = Post.objects.all()
-    serializer_class = PostListSerializer
+    serializer_class = ToggleStatusSerializer
+
+
+class TogglePostStatusViewSet(
+    mixins.RetrieveModelMixin,
+    UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    permission_classes = (AllowAny,)
+
+    # queryset = Post.all_objects.all()
+    # print(queryset)
+
+    def partial_update(self, request, *args, **kwargs):
+
+        kwargs['partial'] = True
+
+        instance = get_object_or_404(Post, pk=kwargs.get('id'))
+
+        if instance.status:
+            instance.status = False
+        else:
+            instance.status = True
+
+        instance.save(update_fields=["status"])
+        serializer = PostListSerializer(instance, many=False)
+        print(serializer.data)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 # Enable disable comment on single post
@@ -145,6 +186,7 @@ class EnableDisableCommentOnPost(
             instance.comment_status = 1
 
         instance.save(update_fields=["comment_status"])
+
         return Response(status=status.HTTP_200_OK)
 
 

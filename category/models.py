@@ -14,7 +14,7 @@ Status = [
 class Category(models.Model):
     name = models.CharField(max_length=80, verbose_name='Category Name')
     slug = models.SlugField(max_length=100)
-    status = models.IntegerField(default=1, choices=Status)
+    status = models.BooleanField(default=False, choices=Status)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='category_created_by')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='category_updated_by')
     created_at = models.DateTimeField(auto_now=True, auto_created=True)

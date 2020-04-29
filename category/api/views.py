@@ -13,13 +13,14 @@ class CategoryViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
     permission_classes = (permissions.AllowAny,)
 
     serializer_class = CategorySerializer
-    queryset = Category.objects.filter(status=1)
+    queryset = Category.objects.filter(status=1).order_by('id').reverse()
 
 
 # enable and disable category status

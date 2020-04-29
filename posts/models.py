@@ -43,8 +43,8 @@ class Post(SoftDeletionModel):
     comment_count = models.IntegerField(default=0)
     views_count = models.IntegerField(default=0)
     comment_status = models.IntegerField(default=0, choices=CommentStatus)
-    status = models.IntegerField(default=0, choices=Status, verbose_name="Publish Status")
-    schedule_date = models.DateTimeField()
+    status = models.BooleanField(default=False, verbose_name="Publish Status")
+    schedule_date = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_created_by')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_updated_by')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -52,6 +52,7 @@ class Post(SoftDeletionModel):
 
     # objects = PostManager()
     class Meta:
+
         pass
 
     def __str__(self):

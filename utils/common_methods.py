@@ -12,10 +12,11 @@ class EnableDisableViewSet(
     UpdateModelMixin,
     viewsets.GenericViewSet
 ):
-
+    print("here")
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         instance = self.get_object()
+        print(instance)
         if instance.status == 1:
             instance.status = 0
         else:
