@@ -50,6 +50,7 @@ urlpatterns = [
     path('api/v1/', include('category.api.urls')),
     path('api/v1/', include('posts.api.urls')),
     path('api/v1/', include('user.api.urls')),
+    path('api/v1/', include('team.api.urls')),
     path('api/v1/auth/login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 

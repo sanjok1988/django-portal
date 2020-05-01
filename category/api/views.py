@@ -1,4 +1,7 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status, permissions
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from category.api.serializers import CategorySerializer
@@ -20,7 +23,7 @@ class CategoryViewSet(
     permission_classes = (permissions.AllowAny,)
 
     serializer_class = CategorySerializer
-    queryset = Category.objects.filter(status=1).order_by('id').reverse()
+    queryset = Category.objects.order_by('id').reverse()
 
 
 # enable and disable category status
@@ -49,3 +52,31 @@ class CategoryEnableDisableViewSet(
 ):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+
+
+class ToggleCategoryStatusViewSet(
+    mixins.RetrieveModelMixin,
+    UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    permission_classes = (AllowAny,)
+
+    # queryset = Post.all_objects.all()
+    # print(queryset)
+
+    def partial_update(self, request, *args, **kwargs):
+
+        kwargs['partial'] = True
+
+        instance = get_object_or_404(Category, pk=kwargs.get('id'))
+
+        if instance.status:
+            instance.status = False
+        else:
+            instance.status = True
+
+        instance.save(update_fields=["status"])
+        serializer = CategorySerializer(instance, many=False)
+
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
