@@ -11,7 +11,7 @@ from comment.models import Comment
 from utils.common_methods import EnableDisableViewSet
 from utils.mixins import UpdateModelMixin
 from .serializers import PostSerializer, PostListSerializer, \
-    PostDetailSerializer, PostCreateSerializer, ToggleStatusSerializer
+    PostDetailSerializer, PostCreateSerializer, ToggleStatusSerializer, PostUpdateSerializer
 from posts.models import Post
 
 
@@ -38,6 +38,14 @@ class PostViewSet(
             return PostDetailSerializer
         if self.action == 'partial_update':
             return PostCreateSerializer
+
+    # using request and response serializer_class different
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = PostCreateSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(PostListSerializer(instance).data)
 
 
 # read detail of post

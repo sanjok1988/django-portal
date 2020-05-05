@@ -36,7 +36,7 @@ class RegisterUserView(CreateAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)#(IsAuthenticated,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -50,6 +50,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
 
     def list(self, request, *args, **kwargs):
         serializer_context = {

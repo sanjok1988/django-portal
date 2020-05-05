@@ -37,6 +37,15 @@ class PostCreateSerializer(serializers.ModelSerializer):
     #     post = Post.objects.create(validated_data)
 
 
+class PostUpdateSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'excerpt', 'status', 'views_count', 'category', 'author']
+
+
 class PostDetailSerializer(serializers.ModelSerializer):
     # category = CategorySerializer()
     # author = AuthorSerializer()

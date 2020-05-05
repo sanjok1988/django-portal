@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'comment',
     'home',
     'team',
+    'albums'
 
 ]
 
