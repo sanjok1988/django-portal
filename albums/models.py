@@ -36,7 +36,7 @@ CommentStatus = [
 class Photo(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, default=1, related_name='photos', null=True, blank=True)
     title = models.CharField(max_length=100, null=True, blank=True)
-    photo = models.ImageField(null=True, blank=True, upload_to='images/posts/%Y-%m-%d/')
+    photo = models.ImageField(null=True, blank=True, upload_to='images/albums/%Y-%m-%d/')
     caption = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(max_length=300, blank=True, null=True)
     like_count = models.IntegerField(default=0)

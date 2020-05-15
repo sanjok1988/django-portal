@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
+from django.template.defaultfilters import slugify
 from django.utils.safestring import mark_safe
 
 from category.models import Category
@@ -32,10 +33,11 @@ class PostManager(models.Manager):
 
 class Post(SoftDeletionModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1,)
-    title = models.CharField(max_length=100)
-    sub_title = models.CharField(max_length=100)
+    title = models.CharField(max_length=250)
+    slug = models.SlugField(max_length=250, blank=True, null=True)
+    sub_title = models.CharField(max_length=250)
     content = RichTextUploadingField()
-    excerpt = models.TextField(max_length=300)
+    excerpt = models.TextField(max_length=500)
     file = models.FileField(null=True, blank=True, upload_to='files/posts/%Y-%m-%d/')
     image = models.ImageField(null=True, blank=True, upload_to='images/posts/%Y-%m-%d/')
     featured_image = models.FileField(null=True, blank=True, upload_to='images/featured/%Y-%m-%d/')
@@ -44,6 +46,8 @@ class Post(SoftDeletionModel):
     views_count = models.IntegerField(default=0)
     comment_status = models.IntegerField(default=0, choices=CommentStatus)
     status = models.BooleanField(default=False, verbose_name="Publish Status")
+    meta_title = models.CharField(max_length=250, blank=True, null=True)
+    meta_description = models.TextField(blank=True, null=True)
     schedule_date = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_created_by')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name='post_updated_by')
@@ -58,6 +62,10 @@ class Post(SoftDeletionModel):
     def __str__(self):
         return 'Title:{}, Category: {} '.format(self.title, self.category)
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(Post, self).save(*args, **kwargs)
+        return self
     # def get_published(self):
     #     return Post.objects.filter(status=1, category__status=1)
 

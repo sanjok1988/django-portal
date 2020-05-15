@@ -29,7 +29,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'excerpt', 'content', 'status', 'category', 'image', 'author']
+        fields = ['id', 'title', 'excerpt', 'content', 'status', 'category', 'image', 'author', 'meta_title', 'meta_description']
     #
     # def create(self, validated_data):
     #     print(validated_data)
@@ -43,7 +43,7 @@ class PostUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'excerpt', 'status', 'views_count', 'category', 'author']
+        fields = ['id', 'title', 'excerpt', 'status', 'views_count', 'category', 'author', 'meta_title', 'meta_description']
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
@@ -54,7 +54,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'sub_title', 'excerpt', 'content', 'file', 'image', 'featured_image',
-                  'views_count', 'comment_status', 'category', 'author', 'status']
+                  'views_count', 'comment_status', 'category', 'author', 'status', 'meta_title', 'meta_description']
 
 
 class ToggleStatusSerializer(serializers.ModelSerializer):
