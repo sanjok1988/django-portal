@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'home',
     'team',
     'albums',
-    'frontend'
+    'frontend',
+    'siteoptions'
 
 ]
 

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 
 
-class HeaderLimitOffsetPagination(LimitOffsetPagination):
+class CustomPagination(LimitOffsetPagination):
     page = 1
     default_limit = 10
     # max_limit = 50

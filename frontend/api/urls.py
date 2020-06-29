@@ -9,7 +9,7 @@ router = routers.DefaultRouter()
 # router.register(r'photo', viewset=PhotoViewSet)
 
 urlpatterns = [
-    path('news/list/<slug>/', NewsListByCategoryViewSet.as_view({'get': 'list'})),
+    path('news/list/<slug>/', NewsListByCategoryViewSet.as_view()),
     path('news/popular/', views.get_popular_news, name="popular_news"),
     path('news/post/<int:id>', views.get_post_detail, name="post_detail"),
     path('news/category/<slug>', views.get_post_by_category, name="post_by_category"),
