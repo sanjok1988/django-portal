@@ -27,7 +27,7 @@ class CategoryChoiceField(forms.ModelChoiceField):
 
 
 class PostAdmin(admin.ModelAdmin, ExportCsvMixin):
-    fields = ('schedule_date', 'category', 'title', 'sub_title', 'content', 'excerpt', 'author', ('featured_image',
+    fields = ( 'category', 'title', 'sub_title', 'content', 'excerpt', 'author', ('featured_image',
               'featured_image_preview'),
               'image', 'file', ('comment_status', 'status',))
     list_display = ['id', 'title', 'category', 'author', 'published_date', 'is_published', 'post_actions',]
